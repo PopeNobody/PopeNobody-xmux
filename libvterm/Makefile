@@ -1,19 +1,12 @@
-ifeq ($(shell uname),Darwin)
-  LIBTOOL ?= glibtool
-else
-  LIBTOOL ?= libtool
-endif
 
-ifneq ($(VERBOSE),1)
-  LIBTOOL +=--quiet
-endif
-
+VERBOSE=1
 override CFLAGS +=-Wall -Iinclude -std=c99 -Wpedantic
 
 ifeq ($(shell uname),SunOS)
   override CFLAGS +=-D__EXTENSIONS__ -D_XPG6 -D__XOPEN_OR_POSIX
 endif
 
+DEBUG=1
 ifeq ($(DEBUG),1)
   override CFLAGS +=-ggdb -DDEBUG
 endif
@@ -25,8 +18,8 @@ endif
 
 CFILES=$(sort $(wildcard src/*.c))
 HFILES=$(sort $(wildcard include/*.h))
-OBJECTS=$(CFILES:.c=.lo)
-LIBRARY=libvterm.la
+OBJECTS=$(CFILES:.c=.o)
+LIBRARY=libvterm.a
 
 BINFILES_SRC=$(sort $(wildcard bin/*.c))
 BINFILES=$(BINFILES_SRC:.c=)
@@ -36,13 +29,7 @@ INCFILES=$(TBLFILES:.tbl=.inc)
 
 HFILES_INT=$(sort $(wildcard src/*.h)) $(HFILES)
 
-VERSION_CURRENT=0
-VERSION_REVISION=4
-VERSION_AGE=0
-
-VERSION=0.1.4
-
-PREFIX=/usr/local
+PREFIX=$(shell cd .. && pwd)
 BINDIR=$(PREFIX)/bin
 LIBDIR=$(PREFIX)/lib
 INCDIR=$(PREFIX)/include
@@ -52,33 +39,27 @@ MAN3DIR=$(MANDIR)/man3
 all: $(LIBRARY) $(BINFILES)
 
 $(LIBRARY): $(OBJECTS)
-	@echo LINK $@
-	@$(LIBTOOL) --mode=link --tag=CC $(CC) -rpath $(LIBDIR) -version-info $(VERSION_CURRENT):$(VERSION_REVISION):$(VERSION_AGE) -o $@ $^ $(LDFLAGS)
+	$(CC) -rpath $(LIBDIR) -version-info $(VERSION_CURRENT):$(VERSION_REVISION):$(VERSION_AGE) -o $@ $^ $(LDFLAGS)
 
-src/%.lo: src/%.c $(HFILES_INT)
-	@echo CC $<
-	@$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
+src/%.o: src/%.c $(HFILES_INT)
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 src/encoding/%.inc: src/encoding/%.tbl
-	@echo TBL $<
-	@perl -CSD tbl2inc_c.pl $< >$@
+	perl -CSD tbl2inc_c.pl $< >$@
 
 src/fullwidth.inc:
-	@perl find-wide-chars.pl >$@
+	perl find-wide-chars.pl >$@
 
-src/encoding.lo: $(INCFILES)
+src/encoding.o: $(INCFILES)
 
 bin/%: bin/%.c $(LIBRARY)
-	@echo CC $<
-	@$(LIBTOOL) --mode=link --tag=CC $(CC) $(CFLAGS) -o $@ $< -lvterm $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $< -lvterm $(LDFLAGS)
 
-t/harness.lo: t/harness.c $(HFILES)
-	@echo CC $<
-	@$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
+t/harness.o: t/harness.c $(HFILES)
+	$(CC) $(CFLAGS) -o $@ -c $<
 
-t/harness: t/harness.lo $(LIBRARY)
-	@echo LINK $@
-	@$(LIBTOOL) --mode=link --tag=CC $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+t/harness: t/harness.o $(LIBRARY)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 .PHONY: test
 test: $(LIBRARY) t/harness
@@ -86,9 +67,9 @@ test: $(LIBRARY) t/harness
 
 .PHONY: clean
 clean:
-	$(LIBTOOL) --mode=clean rm -f $(OBJECTS) $(INCFILES)
-	$(LIBTOOL) --mode=clean rm -f t/harness.lo t/harness
-	$(LIBTOOL) --mode=clean rm -f $(LIBRARY) $(BINFILES)
+	rm -f $(OBJECTS) $(INCFILES)
+	rm -f t/harness.o t/harness
+	rm -f $(LIBRARY) $(BINFILES)
 
 .PHONY: install
 install: install-inc install-lib install-bin
@@ -97,14 +78,18 @@ install-inc:
 	install -d $(DESTDIR)$(INCDIR)
 	install -m644 $(HFILES) $(DESTDIR)$(INCDIR)
 	install -d $(DESTDIR)$(LIBDIR)/pkgconfig
-	sed -e "s,@PREFIX@,$(PREFIX)," -e "s,@LIBDIR@,$(LIBDIR)," -e "s,@VERSION@,$(VERSION)," <vterm.pc.in >$(DESTDIR)$(LIBDIR)/pkgconfig/vterm.pc
+	sed \
+		-e "s,@PREFIX@,$(PREFIX)," \
+		-e "s,@LIBDIR@,$(LIBDIR)," \
+		-e "s,@VERSION@,$(VERSION)," \
+		<vterm.pc.in \
+		>$(DESTDIR)$(LIBDIR)/pkgconfig/vterm.pc
 
 install-lib: $(LIBRARY)
 	install -d $(DESTDIR)$(LIBDIR)
-	$(LIBTOOL) --mode=install install $(LIBRARY) $(DESTDIR)$(LIBDIR)/$(LIBRARY)
-	$(LIBTOOL) --mode=finish $(DESTDIR)$(LIBDIR)
+	install $(LIBRARY) $(DESTDIR)$(LIBDIR)/$(LIBRARY)
 
 install-bin: $(BINFILES)
 	install -d $(DESTDIR)$(BINDIR)
-	$(LIBTOOL) --mode=install install $(BINFILES) $(DESTDIR)$(BINDIR)/
+	install $(BINFILES) $(DESTDIR)$(BINDIR)/
 
