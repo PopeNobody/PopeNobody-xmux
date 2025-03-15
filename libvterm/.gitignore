@@ -3,3 +3,4 @@ bin/unterm
 bin/vterm-ctrl
 bin/vterm-dump
 libvterm.a
+bin/term
