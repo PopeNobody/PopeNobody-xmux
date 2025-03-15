@@ -1,6 +1,6 @@
 MAKEFLAGS+= -rR
 VERBOSE=1
-override CFLAGS +=-Wall -Iinclude -std=gnu17 -Wpedantic
+override CFLAGS +=-Wall -Iinclude -std=gnu17 -Wno-deprecated-declarations
 CC:=gcc
 LD:=ld
 AR:=ar
@@ -18,6 +18,12 @@ ifeq ($(PROFILE),1)
   override CFLAGS +=-pg
   override LDFLAGS+=-pg
 endif
+TERM_CFLAGS  +=$(shell pkg-config --cflags gtk+-2.0)
+TERM_LDFLAGS +=$(shell pkg-config --libs   gtk+-2.0)
+
+TERM_CFLAGS  +=$(shell pkg-config --cflags cairo)
+TERM_LDFLAGS +=$(shell pkg-config --libs   cairo)
+TERM_CFLAGS += -DPANGOTERM_SHAREDIR="\"$(SHAREDIR)\""
 LDFLAGS:= -L $(PWD)
 CFILES=$(sort $(wildcard src/*.c))
 HFILES=$(sort $(wildcard include/*.h))
@@ -25,6 +31,8 @@ OBJECTS=$(CFILES:.c=.o)
 LIBRARY=libvterm.a
 
 BINFILES_SRC=$(sort $(wildcard bin/*.c))
+BINFILES_OBJ=$(BINFILES_SRC:.c=.o)
+.PRECIOUS: $(OBJECTS) $(BINFILES_OBJ)
 BINFILES=$(BINFILES_SRC:.c=)
 
 TBLFILES=$(sort $(wildcard src/encoding/*.tbl))
@@ -46,6 +54,11 @@ $(LIBRARY): $(OBJECTS)
 
 src/%.i: src/%.c $(HFILES_INT)
 	$(CC) $(CFLAGS) -o $@ -E $<
+
+src/pango.i src/conf.i bin/pangoterm.i: CFLAGS+=$(TERM_CFLAGS)
+src/pango.o src/conf.o bin/pangoterm.o: CFLAGS+=$(TERM_CFLAGS)
+
+bin/pangoterm: LDFLAGS+=$(TERM_LDFLAGS)
 
 bin/%.o: bin/%.c $(HFILES_INT)
 	$(CC) $(CFLAGS) -o $@ -c $<
