@@ -1,6 +1,9 @@
-
+MAKEFLAGS+= -rR
 VERBOSE=1
-override CFLAGS +=-Wall -Iinclude -std=c99 -Wpedantic
+override CFLAGS +=-Wall -Iinclude -std=gnu17 -Wpedantic
+CC:=gcc
+LD:=ld
+AR:=ar
 
 ifeq ($(shell uname),SunOS)
   override CFLAGS +=-D__EXTENSIONS__ -D_XPG6 -D__XOPEN_OR_POSIX
@@ -15,7 +18,7 @@ ifeq ($(PROFILE),1)
   override CFLAGS +=-pg
   override LDFLAGS+=-pg
 endif
-
+LDFLAGS:= -L $(PWD)
 CFILES=$(sort $(wildcard src/*.c))
 HFILES=$(sort $(wildcard include/*.h))
 OBJECTS=$(CFILES:.c=.o)
@@ -39,7 +42,16 @@ MAN3DIR=$(MANDIR)/man3
 all: $(LIBRARY) $(BINFILES)
 
 $(LIBRARY): $(OBJECTS)
-	$(CC) -rpath $(LIBDIR) -version-info $(VERSION_CURRENT):$(VERSION_REVISION):$(VERSION_AGE) -o $@ $^ $(LDFLAGS)
+	$(AR) r $@ $^
+
+src/%.i: src/%.c $(HFILES_INT)
+	$(CC) $(CFLAGS) -o $@ -E $<
+
+bin/%.o: bin/%.c $(HFILES_INT)
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+bin/%.i: bin/%.c $(HFILES_INT)
+	$(CC) $(CFLAGS) -o $@ -E $<
 
 src/%.o: src/%.c $(HFILES_INT)
 	$(CC) $(CFLAGS) -o $@ -c $<
@@ -52,8 +64,8 @@ src/fullwidth.inc:
 
 src/encoding.o: $(INCFILES)
 
-bin/%: bin/%.c $(LIBRARY)
-	$(CC) $(CFLAGS) -o $@ $< -lvterm $(LDFLAGS)
+bin/%: bin/%.o $(LIBRARY)
+	$(CC) $(CFLAGS) -o $@ $< -lvterm -lncurses $(LDFLAGS)
 
 t/harness.o: t/harness.c $(HFILES)
 	$(CC) $(CFLAGS) -o $@ -c $<

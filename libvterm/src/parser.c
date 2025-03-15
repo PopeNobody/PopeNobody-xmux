@@ -114,7 +114,7 @@ static void done_string(VTerm *vt, const char *str, size_t len)
       if((*vt->parser.callbacks->dcs)(str, len, vt->parser.cbdata))
         return;
 
-    DEBUG_LOG("libvterm: Unhandled DCS %.*s\n", (int)len, str);
+    DEBUG_LOG("libvterm: Unhandled DCS (%.*s)\n", (int)len, str);
     return;
 
   case VTERM_N_PARSER_TYPES:

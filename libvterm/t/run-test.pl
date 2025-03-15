@@ -8,7 +8,7 @@ use IPC::Open2 qw( open2 );
 use POSIX qw( WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG );
 
 my $VALGRIND = 0;
-my $EXECUTABLE = "t/.libs/harness";
+my $EXECUTABLE = "t/harness";
 GetOptions(
    'valgrind|v+' => \$VALGRIND,
    'executable|e=s' => \$EXECUTABLE
@@ -16,7 +16,6 @@ GetOptions(
 
 my ( $hin, $hout, $hpid );
 {
-   local $ENV{LD_LIBRARY_PATH} = ".libs";
    my @command = $EXECUTABLE;
    unshift @command, "valgrind", "--quiet", "--error-exitcode=126" if $VALGRIND;
 

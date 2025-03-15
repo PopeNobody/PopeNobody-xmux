@@ -1,16 +1,7 @@
-ifeq ($(shell uname),Darwin)
-    LIBTOOL ?= glibtool
-else
-    LIBTOOL ?= libtool
-endif
-
-ifneq ($(VERBOSE),1)
-    LIBTOOL +=--quiet
-endif
-
 CFLAGS  +=-Wall -Iinclude -std=c99 -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED -DGSEAL_ENABLE -DGTK_DISABLE_SINGLE_INCLUDES
 LDFLAGS +=-lutil
 
+#    DEBUG:=1
 ifeq ($(DEBUG),1)
   CFLAGS +=-ggdb -DDEBUG
 endif
@@ -29,7 +20,7 @@ LDFLAGS +=$(shell pkg-config --libs   gtk+-2.0)
 CFLAGS  +=$(shell pkg-config --cflags cairo)
 LDFLAGS +=$(shell pkg-config --libs   cairo)
 
-PREFIX=/usr/local
+PREFIX=$(shell cd .. && pwd)
 BINDIR=$(PREFIX)/bin
 SHAREDIR=$(PREFIX)/share
 
@@ -37,22 +28,19 @@ CFLAGS+=-DPANGOTERM_SHAREDIR="\"$(SHAREDIR)\""
 
 HFILES=$(wildcard *.h)
 CFILES=$(wildcard *.c)
-OBJECTS=$(CFILES:.c=.lo)
+OBJECTS=$(CFILES:.c=.o)
 
 all: pangoterm
 
 pangoterm: $(OBJECTS)
-	@echo LINK $@
-	@$(LIBTOOL) --mode=link --tag=CC $(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-%.lo: %.c $(HFILES)
-	@echo CC $<
-	@$(LIBTOOL) --mode=compile --tag=CC $(CC) $(CFLAGS) -o $@ -c $<
+%.o: %.c $(HFILES)
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 .PHONY: clean
 clean:
-	$(LIBTOOL) --mode=clean rm -f $(OBJECTS)
-	$(LIBTOOL) --mode=clean rm -f pangoterm
+	rm -f $(OBJECTS) pangoterm
 
 .PHONY: install
 install: install-bin install-share
@@ -60,13 +48,14 @@ install: install-bin install-share
 # rm the old binary first in case it's still in use
 install-bin: pangoterm
 	install -d $(DESTDIR)$(BINDIR)
-	$(LIBTOOL) --mode=install cp --remove-destination pangoterm $(DESTDIR)$(BINDIR)/pangoterm
+	rm -f $(DESTDIR)$(BINDIR)/pangoterm
+	install -m755 pangoterm $(DESTDIR)$(BINDIR)/pangoterm
 
 install-share:
 	install -d $(DESTDIR)$(SHAREDIR)/pixmaps
-	$(LIBTOOL) --mode=install cp pangoterm.svg $(DESTDIR)$(SHAREDIR)/pixmaps/
+	install -m644 pangoterm.svg $(DESTDIR)$(SHAREDIR)/pixmaps/
 	install -d $(DESTDIR)$(SHAREDIR)/applications
-	$(LIBTOOL) --mode=install cp pangoterm.desktop $(DESTDIR)$(SHAREDIR)/applications/
+	install -m755 pangoterm.desktop $(DESTDIR)$(SHAREDIR)/applications/
 
 # DIST CUT
 

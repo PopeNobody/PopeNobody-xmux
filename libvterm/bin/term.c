@@ -203,6 +203,8 @@ int main(int argc, char *argv[])
   rows = 25;
   cols = 80;
 
+  dprintf(2,"format==FORMAT_PLAIN: %d\n", (format==FORMAT_PLAIN));
+  dprintf(2,"format==FORMAT_SGR:   %d\n", (format==FORMAT_SGR  ));
   int opt;
   dprintf(2,"argv[0]=%s\n",argv[0]);
   while((opt = getopt(argc, argv, "f:l:c:")) != -1) {
