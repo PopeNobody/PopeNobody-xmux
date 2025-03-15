@@ -9,3 +9,10 @@ fuck
 
 *.o
 *.a
+bin/split-term
+bin/unterm
+bin/vterm-ctrl
+bin/vterm-dump
+libvterm.a
+bin/term
+bin/pangoterm
