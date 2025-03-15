@@ -1,0 +1,54 @@
+Source: libvterm
+Priority: optional
+Maintainer: James McCoy <jamessan@debian.org>
+Build-Depends: debhelper-compat (= 12), libtool-bin
+Standards-Version: 4.5.0
+Section: libs
+Homepage: http://www.leonerd.org.uk/code/libvterm/
+Rules-Requires-Root: no
+Vcs-Git: https://salsa.debian.org/jamessan/libvterm.git
+Vcs-Browser: https://salsa.debian.org/jamessan/libvterm
+
+Package: libvterm-dev
+Section: libdevel
+Multi-Arch: same
+Architecture: any
+Depends: libvterm0 (= ${binary:Version}), ${misc:Depends}
+Description: abstract terminal library (development files)
+ An abstract C99 library which implements a VT220 or xterm-like terminal
+ emulator. It doesn't use any particular graphics toolkit or output
+ system, instead it invokes callback function pointers that its embedding
+ program should provide it to draw on its behalf. It avoids calling
+ malloc() during normal running state, allowing it to be used in embedded
+ kernel situations.
+ .
+ This package contains the header files and libraries needed for developing
+ with libvterm.
+
+Package: libvterm0
+Pre-Depends: ${misc:Pre-Depends}
+Multi-Arch: same
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Breaks: pangoterm (<< 0~bzr608), neovim (<< 0.4)
+Description: abstract terminal library
+ An abstract C99 library which implements a VT220 or xterm-like terminal
+ emulator. It doesn't use any particular graphics toolkit or output
+ system, instead it invokes callback function pointers that its embedding
+ program should provide it to draw on its behalf. It avoids calling
+ malloc() during normal running state, allowing it to be used in embedded
+ kernel situations.
+
+Package: libvterm-bin
+Section: misc
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: abstract terminal library (utility programs)
+ An abstract C99 library which implements a VT220 or xterm-like terminal
+ emulator. It doesn't use any particular graphics toolkit or output
+ system, instead it invokes callback function pointers that its embedding
+ program should provide it to draw on its behalf. It avoids calling
+ malloc() during normal running state, allowing it to be used in embedded
+ kernel situations.
+ .
+ This package contains utility programs that demonstrate libvterm.

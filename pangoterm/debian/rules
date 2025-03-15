@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+
+include /usr/share/dpkg/architecture.mk
+include /usr/share/dpkg/buildflags.mk
+
+LDFLAGS += -Wl,--as-needed
+CFLAGS += $(CPPFLAGS)
+export CFLAGS LDFLAGS
+
+V=VERBOSE=1
+ifneq (,$(filter terse,$(DEB_BUILD_OPTIONS)))
+	V=VERBOSE=0
+endif
+
+%:
+	dh $@
+
+override_dh_auto_build-arch:
+	$(MAKE) $(V) PREFIX=/usr
+
+override_dh_auto_install-arch:
+	$(MAKE) $(V) PREFIX=/usr DESTDIR=$(CURDIR)/debian/tmp install
+
+override_dh_missing:
+	dh_missing --fail-missing

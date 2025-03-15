@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+
+include /usr/share/dpkg/default.mk
+
+CFLAGS += $(CPPFLAGS)
+export CFLAGS LDFLAGS
+
+V=VERBOSE=1
+ifneq (,$(filter terse,$(DEB_BUILD_OPTIONS)))
+	V=VERBOSE=0
+endif
+
+%:
+	dh $@
+
+override_dh_auto_build-arch:
+	$(MAKE) $(V) PREFIX=/usr LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
+
+override_dh_auto_install-arch:
+	$(MAKE) PREFIX=/usr LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH) DESTDIR=$(CURDIR)/debian/tmp install
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	$(MAKE) $(V) test
+endif

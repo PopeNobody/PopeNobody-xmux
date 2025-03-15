@@ -1,0 +1,113 @@
+libvterm (0.1.4-1) unstable; urgency=medium
+
+  * Update to new upstream version 0.1.4.
+
+ -- James McCoy <jamessan@debian.org>  Thu, 01 Oct 2020 22:02:48 -0400
+
+libvterm (0.1.3-1) unstable; urgency=medium
+
+  * Update to new upstream version 0.1.3.
+  * debian/rules:
+    + Adapt to work with released tarball instead of bzr export
+  * Declare compliance with Policy 4.5.0, no changes needed
+
+ -- James McCoy <jamessan@debian.org>  Sun, 29 Mar 2020 18:20:36 -0400
+
+libvterm (0.1.2-2) unstable; urgency=medium
+
+  * Upload to unstable
+
+ -- James McCoy <jamessan@debian.org>  Tue, 12 Nov 2019 22:40:22 -0500
+
+libvterm (0.1.2-1) experimental; urgency=medium
+
+  * New upstream release
+  * rules: Smuggle $CPPFLAGS through $CFLAGS
+  * Fix minimum version for symbols introduced in 0.1
+
+ -- James McCoy <jamessan@debian.org>  Wed, 30 Oct 2019 08:18:06 -0400
+
+libvterm (0.1.1-1) experimental; urgency=medium
+
+  * New upstream releaes
+    + Breaking change for VTermColor type
+  * Update copyright years
+  * rules:
+    + Use $(DEB_UPSTREAM_VERSION) instead of hard-coded version
+    + Add handling for DEB_BUILD_OPTIONS=terse
+  * Update libvterm0.symbols with newly added symbols
+  * control:
+    + libvterm0: Break pangoterm/neovim versions without support for current ABI
+  * Update to debhelper compat 12, using debhelper-compat Build-Depends
+  * Declare compliance with Policy 4.4.0
+
+ -- James McCoy <jamessan@debian.org>  Fri, 20 Sep 2019 22:25:56 -0400
+
+libvterm (0~bzr718-1) unstable; urgency=medium
+
+  * Merge latest snapshot
+    + Fix implementation of query on bracketed paste mode
+  * control: Change Vcs-* to salsa.debian.org
+  * Bump debhelper compat to 11
+  * rules: Disable tests if DEB_BUILD_OPTIONS has nocheck
+  * control: Declare compliance with Policy 4.1.3
+  * control: Mark libvterm-dev Multi-Arch: same
+
+ -- James McCoy <jamessan@debian.org>  Sat, 17 Mar 2018 14:24:13 -0400
+
+libvterm (0~bzr715-1) unstable; urgency=medium
+
+  * Merge latest snapshot
+    + Support reporting FocusIn/FocusOut events
+  * Add new vterm_state_focus_{in,out} symbols
+  * Change Priority to optional
+  * Declare compliance with Policy 4.1.1
+  * Bump debhelper compat to 10
+  * Set R³ to no
+
+ -- James McCoy <jamessan@debian.org>  Thu, 09 Nov 2017 21:52:50 -0500
+
+libvterm (0~bzr710-1) unstable; urgency=medium
+
+  * Merge latest snapshot
+    + Make build reproducible (Closes: #842622)
+  * Declare compliance with Policy 4.0.0, no changes needed
+
+ -- James McCoy <jamessan@debian.org>  Tue, 01 Aug 2017 20:04:29 -0400
+
+libvterm (0~bzr684-1) unstable; urgency=medium
+
+  * New upstream release
+  * Upload to unstable
+  * Declare compliance with policy 3.9.8, no changes required
+  * Migrate to automatic dbgsym package
+
+ -- James McCoy <jamessan@debian.org>  Tue, 30 Aug 2016 17:56:46 -0400
+
+libvterm (0~bzr679-1) experimental; urgency=medium
+
+  * New upstream release
+    + Support for bracketed paste mode
+
+ -- James McCoy <jamessan@debian.org>  Tue, 17 Nov 2015 22:48:42 -0500
+
+libvterm (0~bzr638-1) experimental; urgency=medium
+
+  * Fix Vcs-* URLs.
+  * Merge latest upstream snapshot.
+    + Add Breaks: pangoterm (<< 0~bzr572) due to upstream API changes
+    + Update symbols file
+  * Build from upstream's distdir to use their vterm.pc creation
+  * Declare compatibility with Policy 3.9.6
+
+ -- James McCoy <jamessan@debian.org>  Tue, 24 Feb 2015 22:30:28 -0500
+
+libvterm (0~bzr618-1) experimental; urgency=low
+
+  * Initial release (Closes: #740400)
+  * Fix crash in specific scroll scenarios
+  * Bounds-check number of rows in screen->state before calling
+    vterm_state_get_lineinfo
+  * Set Version in vterm.pc to DEB_VERSION_UPSTREAM
+
+ -- James McCoy <jamessan@debian.org>  Sun, 30 Nov 2014 20:32:10 -0500

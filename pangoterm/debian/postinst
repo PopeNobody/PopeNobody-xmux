@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  configure)
+    update-alternatives --install /usr/bin/x-terminal-emulator \
+      x-terminal-emulator /usr/bin/pangoterm 15
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0
